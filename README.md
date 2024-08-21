@@ -57,7 +57,7 @@ class RegressionModel : public nn::Module<T, RegressionModel<T>> {
 public:
 	RegressionModel()
 	: linLayer1 (this->registerModule(nn::Linear<T>(2, 10))),
-	  linLayer2 (this->registerModule(nn::Linear<T>(10, 1, false)))
+	  linLayer2 (this->registerModule(nn::Linear<T>(10, 1, /*withBias =*/ false)))
 	{}
 
 	num::Tensor<T> forward(const num::Tensor<T>& x) const

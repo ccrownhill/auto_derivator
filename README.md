@@ -1,7 +1,10 @@
-# CppAutoGrad - AutoGrad implementation for self teaching purposes
+# cppAutoGrad - AutoGrad, Tensor, and Neural Network Training Library
 
 A tensor and automatic gradient computation library using reverse
 gradient accumulation similar to PyTorch's autograd.
+
+On top of the autograd and tensor libraries I added a PyTorch-like neural network
+frontend with model base classes and optimizers.
 
 Note that CppAutoGrad is written with *C++23* features and is not
 compatible with prior C++ versions.

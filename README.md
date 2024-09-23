@@ -1,4 +1,4 @@
-# cppAutoGrad - AutoGrad, Tensor, and Neural Network Training Library
+# auto_derivator - AutoGrad, Tensor, and Neural Network Training Library
 
 A tensor and automatic gradient computation library using reverse
 gradient accumulation similar to PyTorch's autograd.

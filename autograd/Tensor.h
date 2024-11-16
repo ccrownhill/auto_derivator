@@ -41,9 +41,15 @@ private:
 	std::shared_ptr<T[]> gradArr;
 	size_type sz;
 public:
-	Tensor(const IntArrRef& dimensions, std::function<T(const IntArrRef&)> fillFn = [](const IntArrRef& idx) -> T { return 0; })
-	  : dims {dimensions.clone()},
-	  	backwardFn ([](const Tensor<T>& grad, const std::vector<Tensor<T>>& oldInputs) {return;}),
+	Tensor(
+            const IntArrRef& dimensions,
+            std::function<T(const IntArrRef&)> fillFn
+                = [](const IntArrRef& idx) -> T { return 0; }
+    ) : dims {dimensions.clone()},
+	  	backwardFn (
+                [](const Tensor<T>& grad, const std::vector<Tensor<T>>& oldInputs)
+                    {return;}
+            ),
 		gradGraphChildren ({})
 	{
 		if (dimensions.size() == 0) {
@@ -65,6 +71,36 @@ public:
 			setSingle(fillFn(idx), idx);
 		}
 	}
+
+    Tensor(
+            const IntArrRef& dimensions,
+            std::initializer_list<T> els
+    ) : dims {dimensions.clone()},
+	  	backwardFn (
+                [](const Tensor<T>& grad, const std::vector<Tensor<T>>& oldInputs)
+                    {return;}
+            ),
+		gradGraphChildren ({})
+	{
+		if (dimensions.size() == 0) {
+			throw std::invalid_argument("need at least one dimension");
+		}
+
+		sz = 1;
+		for (int dim : dims) {
+			if (dim < 0) {
+				throw std::invalid_argument("can't have negative dimension");
+			}
+			sz *= dim;
+		}
+		arr = std::make_shared<T[]>(sz);
+		gradArr = std::make_shared<T[]>(sz);
+
+		for (int i = 0; i < sz; ++i) {
+            arr[i] = *(els.begin() + i);
+		}
+	}
+
 
 	Tensor(T val)
 	  : dims ({1}), arr (std::make_shared<T[]>(1)), sz (1),
@@ -134,6 +170,7 @@ public:
 		std::vector<Tensor<T>> sorted;
 		std::set<std::shared_ptr<T[]>> visited;
 
+        // declare it first to be able to use it recursively
 		std::function<void(const Tensor<T>&)> topologicalSort;
 		topologicalSort =
 			[&sorted, &visited, &topologicalSort](const Tensor<T>& arr) -> void {
@@ -151,8 +188,8 @@ public:
 
 		setGradient(ones<T>(dims));
 
-		for (const Tensor<T>& arr : sorted | std::views::reverse) {
-			arr.backwardFn(arr.getGradient(), arr.gradGraphChildren);
+		for (const Tensor<T>& t : sorted | std::views::reverse) {
+			t.backwardFn(t.getGradient(), t.gradGraphChildren);
 		}
 	}
 

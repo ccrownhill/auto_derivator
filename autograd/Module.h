@@ -34,6 +34,9 @@ public:
 template <num::num_t T>
 class Linear : public Module<T, Linear<T>> {
 public:
+	num::Tensor<T> w;
+	num::Tensor<T> b;
+
 	// weights multiplied by 0.1 to keep them very small
 	Linear(int inFeatures, int outFeatures, bool withBias = true)
 	: w (this->registerParameter(num::Tensor<T>(0.1) * num::randn<T>({outFeatures, inFeatures}))),
@@ -47,11 +50,10 @@ public:
 
 	num::Tensor<T> forward(const num::Tensor<T>& x) const
 	{
+        std::cout << "x: " << x.toString() << "; w: " << w.toString() << std::endl;
 		return autofn::mm<T>(x, autofn::transpose<T>(w)) + b;
 	}
 private:
-	num::Tensor<T> w;
-	num::Tensor<T> b;
 	bool withBias;
 };
 
